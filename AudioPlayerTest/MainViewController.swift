@@ -41,27 +41,27 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                           albumName: "Brightest lights",
                           artistName: "Lane 8",
                           imageName: "artCover",
-                          trackURL: URL(fileURLWithPath: "https://www.dropbox.com/s/0iwwuh8unyvmxut/01.%20Groundhog%20Day.mp3?dl=1")))
+                          trackURL: "https://www.dropbox.com/s/0iwwuh8unyvmxut/01.%20Groundhog%20Day.mp3?dl=1"))
         songs.append(Song(name: "Road (Feat. Arctic Lake)",
                           albumName: "Brightest lights",
                           artistName: "Lane 8",
                           imageName: "artCover",
-                          trackURL: URL(fileURLWithPath: "https://www.dropbox.com/s/y9v1geqx5nq2jl9/02.%20Road%20%28Feat.%20Arctic%20Lake%29.mp3?dl=1")))
+                          trackURL:  "https://www.dropbox.com/s/y9v1geqx5nq2jl9/02.%20Road%20%28Feat.%20Arctic%20Lake%29.mp3?dl=1"))
         songs.append(Song(name: "Just",
                           albumName: "Brightest lights",
                           artistName: "Lane 8",
                           imageName: "artCover",
-                          trackURL: URL(fileURLWithPath: "https://www.dropbox.com/s/angl3sc08e2rw6a/03.%20Just.mp3?dl=1")))
+                          trackURL: "https://www.dropbox.com/s/angl3sc08e2rw6a/03.%20Just.mp3?dl=1"))
         songs.append(Song(name: "Brightest Lights (Feat. POLICA)",
                           albumName: "Brightest lights",
                           artistName: "Lane 8",
                           imageName: "artCover",
-                          trackURL: URL(fileURLWithPath: "https://www.dropbox.com/s/c683ymjf595d0i2/04.%20Brightest%20Lights%20%28Feat.%20POLICA%29.mp3?dl=1")))
+                          trackURL: "https://www.dropbox.com/s/c683ymjf595d0i2/04.%20Brightest%20Lights%20%28Feat.%20POLICA%29.mp3?dl=1"))
         songs.append(Song(name: "Sunday Song",
                           albumName: "Brightest lights",
                           artistName: "Lane 8",
                           imageName: "artCover",
-                          trackURL: URL(fileURLWithPath: "https://www.dropbox.com/s/c6f3crqjipawztw/05.%20Sunday%20Song.mp3?dl=1")))
+                          trackURL: "https://www.dropbox.com/s/c6f3crqjipawztw/05.%20Sunday%20Song.mp3?dl=1"))
     }
     
     
@@ -98,15 +98,17 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        guard let localURLU = songs[indexPath.row].localURL else {return}
+        
         let song = songs[indexPath.row]
         
         if song.isDownloaded{
-            play(url: song.localURL)
+            play(url: localURLU)
         }else{
             song.download()
             song.downloadCallBack = { [unowned self] downloaded in
                 if downloaded{
-                    play(url: song.localURL)
+                    play(url: localURLU)
                 } else{
                     // Alert
                 }
@@ -119,8 +121,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     @objc func playButtonPressed(_ sender: UIButton){
         
-        
-       
         
         let musicPath = Bundle.main.path(forResource: "01. Groundhog Day", ofType: "mp3")
         do{

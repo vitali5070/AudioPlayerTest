@@ -8,11 +8,13 @@
 import Foundation
 
 class Song: NSObject, URLSessionDownloadDelegate {
+    
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-
+        guard let localURLU = localURL else { return }
+        
         do {
-            try FileManager.default.copyItem(at: location, to: localURL)
+            try FileManager.default.copyItem(at: location, to: localURLU)
             downloadCallBack?(true)
         } catch  {
             print(error)
@@ -33,7 +35,7 @@ class Song: NSObject, URLSessionDownloadDelegate {
     albumName: String,
     artistName: String,
     imageName: String,
-    trackURL: URL) {
+    trackURL: String) {
         self.name = name
         self.albumName = albumName
         self.artistName = artistName
@@ -46,52 +48,46 @@ class Song: NSObject, URLSessionDownloadDelegate {
     let albumName: String
     let artistName: String
     let imageName: String
-    let trackURL: URL
+    let trackURL: String
     
     var progressCallBack:((_ :Float) -> Void)?
     var downloadCallBack:((_ :Bool) -> Void)?
     
-    var localURL: URL {
+    var localURL: URL? {
+        
+        guard let trackURLU = URL(string: trackURL) else {return nil}
+        
         let docsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let destinationPath = docsPath.appendingPathComponent(trackURL.lastPathComponent)
+        let destinationPath = docsPath.appendingPathComponent(trackURLU.lastPathComponent)
         print(destinationPath)
-        return destinationPath
+            return destinationPath
     }
     var isDownloaded: Bool {
-        let data = FileManager.default.contents(atPath: localURL.absoluteString)
+        
+        guard let localURLU = localURL else { return false }
+        
+        let data = FileManager.default.contents(atPath: localURLU.absoluteString)
         return data != nil ? true : false
     }
     
     
     
     func download(){
-//        let request = URLRequest(url: trackURL)
-//
-//        let downloadTask = URLSession.shared.downloadTask(with: request) { [unowned self] (url, response, error) in
-//
-//            guard let tempURL = url, error == nil else {
-//                self.downloadCallBack?(false)
-//                return
-//            }
-//
-//            do {
-//                try FileManager.default.moveItem(at: tempURL, to: localURL)
-//                downloadCallBack?(true)
-//            } catch  {
-//                print(error)
-//                downloadCallBack?(false)
-//            }
-//        }
+        
+        guard let localURLU = localURL, let trackURLU = URL(string: trackURL) else { return }
+
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async(execute: {
-            if FileManager.default.fileExists(atPath: self.localURL.path) {
+            if FileManager.default.fileExists(atPath: localURLU.path) {
             print("The file already exists at path")
 
         } else {
-            URLSession.shared.downloadTask(with: self.trackURL) { location, response, error in
+
+            URLSession.shared.downloadTask(with: trackURLU) { location, response, error in
                 guard let location = location, error == nil else { return }
+        
                 do {
                     // after downloading your file you need to move it to your destination url
-                    try FileManager.default.moveItem(at: location, to: self.localURL)
+                    try FileManager.default.moveItem(at: location, to: localURLU)
                     print("File moved to documents folder")
                 } catch {
                     print(error)
