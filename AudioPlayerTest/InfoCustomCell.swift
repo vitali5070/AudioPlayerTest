@@ -27,7 +27,7 @@ class InfoCustomCell: UITableViewCell {
         guard let songU = self.song else { return }
         songImage.image = UIImage(named: songU.imageName)
         songU.progressCallBack = { [unowned self] progress in
-            self.downloadProgress.progress = progress
+            self.downloadProgress.progress += progress
             self.layoutIfNeeded()
         }
     }

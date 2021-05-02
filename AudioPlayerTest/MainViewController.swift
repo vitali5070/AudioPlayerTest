@@ -99,10 +99,18 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         cell.cellDelegate = self
         cell.downloadButton.tag = indexPath.row
         
-        if song.isDownloaded == true{
-            cell.downloadButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
-        } else {
-            cell.downloadButton.setImage(UIImage.init(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+        let title = song.isDownloaded ? "play.fill" : "icloud.and.arrow.down.fill"
+        cell.downloadButton.setImage(UIImage(systemName: title), for: .normal)
+        
+//        if song.isDownloaded == true{
+//            cell.downloadButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
+//        } else {
+//            cell.downloadButton.setImage(UIImage.init(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+//        }
+        
+        song.progressCallBack = { progress in
+//            cell.downloadProgress.setProgress(progress, animated: true)
+            cell.downloadProgress.progress = progress
         }
         
         return cell

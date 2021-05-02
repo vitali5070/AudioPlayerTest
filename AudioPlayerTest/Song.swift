@@ -10,26 +10,9 @@ import AVFoundation
 
 class Song: NSObject, URLSessionDownloadDelegate {
     
+    var progress: Float = 0.0
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        guard let localURLU = localURL else { return }
-        
-        do {
-            try FileManager.default.copyItem(at: location, to: localURLU)
-            downloadCallBack?(true)
-        } catch  {
-            print(error)
-            downloadCallBack?(false)
-        }
-        
-        
-    }
     
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64){
-        let progress: Float = 0.0
-        //var progress: Float = 0.0
-        self.progressCallBack?(progress)
-    }
     
     
     init(name: String,
@@ -87,11 +70,38 @@ class Song: NSObject, URLSessionDownloadDelegate {
                     do {
                         try FileManager.default.moveItem(at: location, to: localURLU)
                         print("File moved to documents folder")
+                        self.downloadCallBack?(true)
                     } catch {
                         print(error)
+                        self.downloadCallBack?(false)
                     }
                 }.resume()
             }
         })
+    }
+    
+    // MARK: URLSessionDownloadDelegate
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let localURLU = localURL else { return }
+        
+        do {
+            try FileManager.default.copyItem(at: location, to: localURLU)
+            downloadCallBack?(true)
+        } catch  {
+            print(error)
+            downloadCallBack?(false)
+        }
+        
+        
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64){
+        
+        progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        DispatchQueue.main.async {
+            self.progressCallBack?(self.progress)
+            print(self.progress)
+            }
     }
 }
