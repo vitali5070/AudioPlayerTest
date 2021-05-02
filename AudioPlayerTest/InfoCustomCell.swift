@@ -7,9 +7,13 @@
 
 import UIKit
 
+protocol CellDelegate {
+    func downloadButtonPressed(_ tag: Int)
+}
+
 class InfoCustomCell: UITableViewCell {
     
-    
+    var cellDelegate: CellDelegate?
     
     @IBOutlet weak var songImage: UIImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
@@ -30,6 +34,10 @@ class InfoCustomCell: UITableViewCell {
     
     func setup(with song: Song) {
         self.song = song
+    }
+    
+    @IBAction func downloadButtonTapped(_ sender: UIButton) {
+        cellDelegate?.downloadButtonPressed(sender.tag)
     }
     
     

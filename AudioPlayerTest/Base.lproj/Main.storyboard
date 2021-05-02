@@ -55,7 +55,7 @@
                                                         <constraint firstAttribute="width" constant="30" id="dDZ-oS-z8p"/>
                                                     </constraints>
                                                     <connections>
-                                                        <action selector="downloadButtonTapped:" destination="SA7-74-eF7" eventType="touchUpInside" id="PIA-lK-xhu"/>
+                                                        <action selector="downloadButtonTapped:" destination="TKL-5I-2b3" eventType="touchUpInside" id="vk5-Hy-Tqp"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -76,7 +76,7 @@
                                             <constraint firstAttribute="bottom" secondItem="ocC-SK-6Np" secondAttribute="bottom" constant="5" id="ttH-bq-NIx"/>
                                         </constraints>
                                         <connections>
-                                            <outlet property="downloadButton" destination="Dke-J9-9fj" id="vRx-RV-3XX"/>
+                                            <outlet property="downloadButton" destination="Dke-J9-9fj" id="Msx-O6-Ges"/>
                                             <outlet property="downloadProgress" destination="ocC-SK-6Np" id="PGh-N0-UG1"/>
                                             <outlet property="songImage" destination="LeO-5Z-Vyq" id="Gha-DY-qHQ"/>
                                             <outlet property="titleLabel" destination="f2s-Lw-MoH" id="JnN-C1-GkA"/>

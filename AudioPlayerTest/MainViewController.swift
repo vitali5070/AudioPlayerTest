@@ -8,12 +8,11 @@
 import UIKit
 import AVFoundation
 
-class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    
-    
+class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate {
+
     @IBOutlet weak var tableView: UITableView!
     
+    let fileManager = FileManager.default
     var headerHeight: CGFloat = 50
     var audioPlayer = AVAudioPlayer()
     
@@ -64,14 +63,22 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                           trackURL: "https://www.dropbox.com/s/c6f3crqjipawztw/05.%20Sunday%20Song.mp3?dl=1"))
     }
     
-    
-    @IBAction func downloadButtonTapped(_ sender: Any) {
+    func downloadButtonPressed(_ tag: Int) {
         
+        let song = songs[tag]
+        guard let localURLU = song.localURL else {return}
         
+        if song.isDownloaded{
+            play(url: localURLU)
+        }else{
+            song.download()
+            song.downloadCallBack = { [unowned self] downloaded in
+                if downloaded{
+                    play(url: localURLU)
+                }
+            }
+        }
     }
-    
-    
-    
 
     // MARK: - Table view data source
 
@@ -81,14 +88,23 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
 
     
-     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! InfoCustomCell
         
         let song = songs[indexPath.row]
         
         cell.titleLabel.text = song.name
         cell.songImage.image = UIImage.init(named: song.imageName)
-    cell.downloadButton.setImage(UIImage.init(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+        
+        cell.cellDelegate = self
+        cell.downloadButton.tag = indexPath.row
+        
+        if song.isDownloaded == true{
+            cell.downloadButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
+        } else {
+            cell.downloadButton.setImage(UIImage.init(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+        }
+        
         return cell
     }
     
@@ -97,24 +113,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // переход на второй вид и передача мета данных в него
         
-        guard let localURLU = songs[indexPath.row].localURL else {return}
-        
-        let song = songs[indexPath.row]
-        
-        if song.isDownloaded{
-            play(url: localURLU)
-        }else{
-            song.download()
-            song.downloadCallBack = { [unowned self] downloaded in
-                if downloaded{
-                    play(url: localURLU)
-                } else{
-                    // Alert
-                }
-            }
-        }
-        
+    
     }
     
     // MARK: Player functions
@@ -138,14 +139,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
                 audioPlayer.play()
         }
-        
-//        if playButton.imageView?.image == UIImage(systemName: "play.fill"){
-//            playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-//            audioPlayer.play()
-//        } else{
-//            playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-//            audioPlayer.pause()
-//        }
     }
     
     func play(url:URL) {
