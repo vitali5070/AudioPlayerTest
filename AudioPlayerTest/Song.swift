@@ -70,13 +70,15 @@ class Song: NSObject, URLSessionDownloadDelegate {
     }
     
     func pauseDownload(){
+        print("PAUSE")
         guard let trackURLU = URL(string: trackURL), isDownloading else {return}
-        
+
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async(execute: {
-        let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: .current)
-        urlSession.downloadTask(with: trackURLU).cancel { (data) in
-            self.resumeData = data
-        }
+            let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: .current)
+            urlSession.downloadTask(with: trackURLU).cancel(byProducingResumeData: { [unowned self] data in
+                guard let data = data else {return}
+                self.resumeData = data
+          })
         self.isDownloading = false
         })
     }

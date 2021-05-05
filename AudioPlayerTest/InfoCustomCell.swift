@@ -45,7 +45,6 @@ class InfoCustomCell: UITableViewCell {
     }
     
     @IBAction func pauseResumeDownloadButtonTapped(_ sender: UIButton) {
-        print("PAUSE")
         pauseResumeDownloadButtonCallBack?()
     }
     
