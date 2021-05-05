@@ -14,11 +14,14 @@ protocol CellDelegate {
 class InfoCustomCell: UITableViewCell {
     
     var cellDelegate: CellDelegate?
+    var downloadButtonCallBack: ( ()-> Void )?
+    var pauseResumeDownloadButtonCallBack: ( ()-> Void )?
     
     @IBOutlet weak var songImage: UIImageView!
     @IBOutlet weak var downloadProgress: UIProgressView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var downloadButton: UIButton!
+    @IBOutlet weak var pauseResumeDownloadButton: UIButton!
     
     var song: Song?
     
@@ -37,7 +40,13 @@ class InfoCustomCell: UITableViewCell {
     }
     
     @IBAction func downloadButtonTapped(_ sender: UIButton) {
-        cellDelegate?.downloadButtonPressed(sender.tag)
+        print("DOWNLOAD")
+        downloadButtonCallBack?()
+    }
+    
+    @IBAction func pauseResumeDownloadButtonTapped(_ sender: UIButton) {
+        print("PAUSE")
+        pauseResumeDownloadButtonCallBack?()
     }
     
     
