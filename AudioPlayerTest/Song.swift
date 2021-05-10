@@ -10,8 +10,6 @@ import AVFoundation
 
 class Song: NSObject, URLSessionDownloadDelegate {
     
-    var progress: Float = 0.0
-
     init(name: String,
          albumName: String,
          artistName: String,
@@ -25,16 +23,25 @@ class Song: NSObject, URLSessionDownloadDelegate {
         super.init()
     }
     
+    var progress: Float = 0.0
+    var session: URLSession?
+    var downloadTask: URLSessionDownloadTask?
+    
     let name: String
     let albumName: String
     let artistName: String
     let imageName: String
     let trackURL: String
     var isDownloading: Bool = false
+    var isDownloadInProgress:Bool {
+            downloadTask != nil
+        }
     var resumeData: Data?
     
     var progressCallBack:((_ :Float) -> Void)?
     var downloadCallBack:((_ :Bool) -> Void)?
+    var stopDownloadCallBack:((_ :Bool) -> Void)?
+
     
     var localURL: URL? {
         guard let trackURLU = URL(string: trackURL) else { return nil }
@@ -45,7 +52,6 @@ class Song: NSObject, URLSessionDownloadDelegate {
         return destinationPath
     }
     var isDownloaded: Bool {
-        
         guard let localURLU = localURL else { return false }
         let fileExist = FileManager.default.fileExists(atPath: localURLU.path)
         print(fileExist)
@@ -54,7 +60,7 @@ class Song: NSObject, URLSessionDownloadDelegate {
     
     
     
-    func download(){
+    func download() {
         
         guard let localURLU = localURL, let trackURLU = URL(string: trackURL) else { return }
         
@@ -62,27 +68,38 @@ class Song: NSObject, URLSessionDownloadDelegate {
             if FileManager.default.fileExists(atPath: localURLU.path) {
                 print("The file already exists at path")
             } else {
-                let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: .current)
-                urlSession.downloadTask(with: trackURLU).resume()
-                self.isDownloading = true
+                self.session = URLSession.init(configuration: .default, delegate: self, delegateQueue: .main)
+                self.downloadTask = self.session?.downloadTask(with: trackURLU)
+                self.downloadTask?.resume()
             }
         })
+        self.isDownloading = true
     }
     
-    func pauseDownload(){
+    func pauseDownload() {
+        if downloadTask != nil && isDownloading{
         print("PAUSE")
-        guard let trackURLU = URL(string: trackURL), isDownloading else {return}
-
-        DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async(execute: {
-            let urlSession = URLSession(configuration: .default, delegate: self, delegateQueue: .current)
-            urlSession.downloadTask(with: trackURLU).cancel(byProducingResumeData: { [unowned self] data in
-                guard let data = data else {return}
-                self.resumeData = data
-          })
-        self.isDownloading = false
+        self.downloadTask?.cancel(byProducingResumeData: { (data) in
+            guard let resumeData = data else { return }
+            self.resumeData = resumeData
         })
+        self.isDownloading = false
     }
-    
+    }
+    func resumeDownload() {
+        if !isDownloading && resumeData != nil{
+        print("RESUME")
+        print("Resume data = \(String(describing: resumeData))")
+        if let data = self.resumeData{
+            print("Data = \(data)")
+            self.downloadTask = self.session?.downloadTask(withResumeData: data)
+            self.isDownloading = true
+        } else {
+            self.download()
+        }
+            downloadTask?.resume()
+    }
+    }
     // MARK: URLSessionDownloadDelegate
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
@@ -110,4 +127,13 @@ class Song: NSObject, URLSessionDownloadDelegate {
             print(self.progress)
         }
     }
+    
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let error = error else { return }
+        let userInfo = (error as NSError).userInfo
+        if let resumeData = userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+            self.resumeData = resumeData
+        }
+    }
+    
 }

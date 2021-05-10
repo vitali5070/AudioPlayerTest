@@ -102,8 +102,15 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                     cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
                     cell.pauseResumeDownloadButton.isHidden = false
                     cell.pauseResumeDownloadButtonCallBack = {
-                        // вызов функции паузы загрузки
-                        song.pauseDownload()
+                        switch song.isDownloading {
+                        case false:
+                            song.resumeDownload()
+                            cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                        case true:
+                            song.pauseDownload()
+                            cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+                        }
+                        
                     }
                 }
                 song.downloadCallBack = { [unowned self] downloaded in
@@ -152,7 +159,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func play(url:URL) {
         print("playing \(url)")
-        
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             audioPlayer = try AVAudioPlayer(contentsOf: url)

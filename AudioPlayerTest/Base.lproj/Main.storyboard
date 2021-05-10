@@ -21,82 +21,88 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="TKL-5I-2b3" customClass="InfoCustomCell" customModule="AudioPlayerTest" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="14.5"/>
+                                        <rect key="frame" x="0.0" y="28" width="375" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="TKL-5I-2b3" id="7wn-MD-sbm">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="14.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ocC-SK-6Np">
-                                                    <rect key="frame" x="0.0" y="5" width="375" height="4.5"/>
+                                                    <rect key="frame" x="0.0" y="5" width="375" height="33.5"/>
                                                     <color key="progressTintColor" systemColor="systemGreenColor"/>
                                                     <color key="trackTintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </progressView>
-                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LeO-5Z-Vyq">
-                                                    <rect key="frame" x="10" y="-8" width="30" height="30.5"/>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wQ-gJ-5kj">
+                                                    <rect key="frame" x="295" y="7" width="30" height="30"/>
                                                     <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="nwV-eu-PmQ"/>
-                                                        <constraint firstAttribute="width" constant="30" id="wWd-uq-azz"/>
+                                                        <constraint firstAttribute="height" constant="30" id="HUn-Xk-SiN"/>
+                                                        <constraint firstAttribute="width" constant="30" id="aw1-Pl-wq3"/>
+                                                    </constraints>
+                                                    <connections>
+                                                        <action selector="pauseResumeDownloadButtonTapped:" destination="TKL-5I-2b3" eventType="touchUpInside" id="o8W-Se-dY5"/>
+                                                    </connections>
+                                                </button>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="LeO-5Z-Vyq">
+                                                    <rect key="frame" x="10" y="7" width="30" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="30" id="73S-X9-LDS"/>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="30" id="U7Y-cE-IeM"/>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="dpJ-NR-GJA"/>
+                                                        <constraint firstAttribute="height" constant="30" id="xhG-dW-CpV"/>
                                                     </constraints>
                                                 </imageView>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f2s-Lw-MoH">
-                                                    <rect key="frame" x="50" y="-8" width="235" height="30.5"/>
+                                                    <rect key="frame" x="50" y="7" width="235" height="30"/>
                                                     <constraints>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="Amg-I1-Y6J"/>
                                                         <constraint firstAttribute="height" constant="30" id="P5i-6f-9XE"/>
-                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="eZL-BR-0Is"/>
                                                     </constraints>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dke-J9-9fj">
-                                                    <rect key="frame" x="335" y="-8" width="30" height="30.5"/>
+                                                    <rect key="frame" x="335" y="7" width="30" height="30"/>
                                                     <constraints>
+                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="30" id="06j-Kx-rnE"/>
                                                         <constraint firstAttribute="height" constant="30" id="Jup-tv-P6i"/>
-                                                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="30" id="XPo-DG-s99"/>
+                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="Rrf-xe-b4x"/>
                                                         <constraint firstAttribute="width" constant="30" id="dDZ-oS-z8p"/>
-                                                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="30" id="rJS-Vm-0Ck"/>
                                                     </constraints>
                                                     <connections>
                                                         <action selector="downloadButtonTapped:" destination="TKL-5I-2b3" eventType="touchUpInside" id="vk5-Hy-Tqp"/>
                                                     </connections>
                                                 </button>
-                                                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aEE-en-VSi">
-                                                    <rect key="frame" x="295" y="-8" width="30" height="30.5"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="30" id="1mV-FO-0Cd"/>
-                                                        <constraint firstAttribute="width" constant="30" id="p7O-XZ-QtD"/>
-                                                    </constraints>
-                                                    <connections>
-                                                        <action selector="pauseResumeDownloadButtonTapped:" destination="TKL-5I-2b3" eventType="touchUpInside" id="ypx-dR-hF5"/>
-                                                    </connections>
-                                                </button>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstItem="aEE-en-VSi" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="95f-4x-IL2"/>
+                                                <constraint firstItem="Dke-J9-9fj" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="0eA-4Z-y9o"/>
+                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="leading" secondItem="7wn-MD-sbm" secondAttribute="leading" constant="10" id="1dI-tO-YML"/>
+                                                <constraint firstItem="f2s-Lw-MoH" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="3px-MN-CdO"/>
+                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="4Q4-yO-xYQ"/>
+                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="Coy-FJ-wvP"/>
                                                 <constraint firstAttribute="trailing" secondItem="Dke-J9-9fj" secondAttribute="trailing" constant="10" id="GOF-uw-HY8"/>
-                                                <constraint firstItem="ocC-SK-6Np" firstAttribute="top" secondItem="7wn-MD-sbm" secondAttribute="top" constant="5" id="LOK-ew-idc"/>
-                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="leading" secondItem="7wn-MD-sbm" secondAttribute="leading" constant="10" id="MU8-d9-Sxq"/>
-                                                <constraint firstAttribute="trailing" secondItem="Dke-J9-9fj" secondAttribute="trailing" constant="10" id="OzQ-9H-xa7"/>
-                                                <constraint firstItem="ocC-SK-6Np" firstAttribute="leading" secondItem="7wn-MD-sbm" secondAttribute="leading" id="P2b-H0-LNx"/>
-                                                <constraint firstItem="f2s-Lw-MoH" firstAttribute="leading" secondItem="LeO-5Z-Vyq" secondAttribute="trailing" constant="10" id="Rt3-cd-See"/>
-                                                <constraint firstItem="f2s-Lw-MoH" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="TfM-on-hrP"/>
-                                                <constraint firstItem="aEE-en-VSi" firstAttribute="leading" secondItem="f2s-Lw-MoH" secondAttribute="trailing" constant="10" id="VMg-PR-yk7"/>
-                                                <constraint firstAttribute="trailing" secondItem="ocC-SK-6Np" secondAttribute="trailing" id="XJA-dC-fiX"/>
+                                                <constraint firstItem="f2s-Lw-MoH" firstAttribute="leading" secondItem="LeO-5Z-Vyq" secondAttribute="trailing" constant="10" id="RTx-pD-Ieu"/>
                                                 <constraint firstItem="Dke-J9-9fj" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="YRL-a5-1ml"/>
                                                 <constraint firstItem="f2s-Lw-MoH" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="Zbi-4H-IIB"/>
-                                                <constraint firstItem="Dke-J9-9fj" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="b8c-iW-vtq"/>
-                                                <constraint firstItem="Dke-J9-9fj" firstAttribute="leading" secondItem="7wn-MD-sbm" secondAttribute="trailing" constant="-40" id="hBm-n5-k9q"/>
-                                                <constraint firstAttribute="bottom" secondItem="ocC-SK-6Np" secondAttribute="bottom" constant="5" id="j7M-6I-DdQ"/>
-                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="ppg-yw-io1"/>
+                                                <constraint firstItem="1wQ-gJ-5kj" firstAttribute="leading" secondItem="f2s-Lw-MoH" secondAttribute="trailing" constant="10" id="eV5-LB-aWt"/>
+                                                <constraint firstItem="1wQ-gJ-5kj" firstAttribute="centerY" secondItem="7wn-MD-sbm" secondAttribute="centerY" id="iHE-Fe-wEo"/>
+                                                <constraint firstItem="LeO-5Z-Vyq" firstAttribute="leading" secondItem="7wn-MD-sbm" secondAttribute="leading" constant="10" id="jyg-0S-CJ4"/>
+                                                <constraint firstAttribute="trailing" secondItem="Dke-J9-9fj" secondAttribute="trailing" constant="10" id="kDT-hc-k5i"/>
                                                 <constraint firstItem="Dke-J9-9fj" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f2s-Lw-MoH" secondAttribute="trailing" constant="10" id="qsJ-09-5Gj"/>
-                                                <constraint firstItem="Dke-J9-9fj" firstAttribute="leading" secondItem="aEE-en-VSi" secondAttribute="trailing" constant="10" id="zgW-fd-Yfk"/>
+                                                <constraint firstItem="f2s-Lw-MoH" firstAttribute="leading" secondItem="LeO-5Z-Vyq" secondAttribute="trailing" constant="10" id="vgk-Rr-Qd0"/>
+                                                <constraint firstItem="Dke-J9-9fj" firstAttribute="leading" secondItem="1wQ-gJ-5kj" secondAttribute="trailing" constant="10" id="zhd-Lg-hde"/>
                                             </constraints>
                                         </tableViewCellContentView>
+                                        <constraints>
+                                            <constraint firstAttribute="trailing" secondItem="ocC-SK-6Np" secondAttribute="trailing" id="cGv-NE-xuo"/>
+                                            <constraint firstAttribute="bottom" secondItem="ocC-SK-6Np" secondAttribute="bottom" constant="5" id="eGt-5p-o8H"/>
+                                            <constraint firstItem="ocC-SK-6Np" firstAttribute="top" secondItem="TKL-5I-2b3" secondAttribute="top" constant="5" id="hHY-QO-3Xz"/>
+                                            <constraint firstItem="ocC-SK-6Np" firstAttribute="leading" secondItem="TKL-5I-2b3" secondAttribute="leading" id="qoP-OZ-iwd"/>
+                                        </constraints>
                                         <connections>
                                             <outlet property="downloadButton" destination="Dke-J9-9fj" id="Msx-O6-Ges"/>
                                             <outlet property="downloadProgress" destination="ocC-SK-6Np" id="PGh-N0-UG1"/>
-                                            <outlet property="pauseResumeDownloadButton" destination="aEE-en-VSi" id="kQc-x1-YJG"/>
+                                            <outlet property="pauseResumeDownloadButton" destination="1wQ-gJ-5kj" id="P49-gS-9DH"/>
                                             <outlet property="songImage" destination="LeO-5Z-Vyq" id="Gha-DY-qHQ"/>
                                             <outlet property="titleLabel" destination="f2s-Lw-MoH" id="JnN-C1-GkA"/>
                                         </connections>
