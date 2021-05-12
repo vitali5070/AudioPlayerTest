@@ -17,18 +17,19 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var audioPlayer: AVAudioPlayer?
     
     let playButton = UIButton()
-    let timeSlider = UISlider()
+    var timeSlider = UISlider()
     let timeLabel = UILabel()
     
     
     
     var songs = [Song]()
-//    let position: Int = 0
+    //    let position: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         addSongList()
+        
     }
     
     // MARK: Functions
@@ -59,6 +60,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                           artistName: "Lane 8",
                           imageName: "artCover",
                           trackURL: "https://www.dropbox.com/s/c6f3crqjipawztw/05.%20Sunday%20Song.mp3?dl=1"))
+    }
+    
+    func timeString(time: TimeInterval) -> String {
+        let minutes = Int(time) / 60 % 60
+        let seconds = Int(time) % 60
+        return String(format:"%02i:%02i", minutes, seconds)
     }
     
     func downloadButtonPressed(_ tag: Int) {
@@ -93,9 +100,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         cell.downloadButtonCallBack = { [unowned self] in
             guard let localURLU = song.localURL else {return}
+            song.downloadTask?.cancel()
             if song.isDownloaded{
                 play(url: localURLU)
                 self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                cell.pauseResumeDownloadButton.isHidden = true
             }else{
                 song.download()
                 if cell.downloadProgress.progress < 1 {
@@ -156,17 +165,38 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
     }
     
+    @objc func audioTimeController(_ sender: UISlider){
+        
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = TimeInterval(timeSlider.value)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+        playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+        
+    }
+    
+    @objc func updateTimeValue(){
+        if let currentTime = audioPlayer?.currentTime {
+            timeSlider.value = Float(currentTime)
+            timeLabel.text = timeString(time: currentTime)
+        }
+    }
+    
     
     func play(url:URL) {
         print("playing \(url)")
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback)
             audioPlayer = try AVAudioPlayer(contentsOf: url)
+            if let duration = audioPlayer?.duration {
+                timeSlider.maximumValue = Float(duration)
+            }
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateTimeValue), userInfo: nil, repeats: true)
             audioPlayer?.volume = 1.0
+            audioPlayer?.prepareToPlay()
             audioPlayer?.play()
         } catch {
             print(error.localizedDescription)
-            print("player error")
         }
         
     }
@@ -204,11 +234,12 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         timeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 30).isActive = true
         timeLabel.adjustsFontSizeToFitWidth = true
         timeLabel.text = "01:20"
-    
+        
         timeSlider.translatesAutoresizingMaskIntoConstraints = false
         timeSlider.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
         timeSlider.leftAnchor.constraint(equalTo: playButton.rightAnchor, constant: 10).isActive = true
         timeSlider.rightAnchor.constraint(equalTo: timeLabel.leftAnchor,constant: -10).isActive = true
+        timeSlider.addTarget(self, action: #selector(audioTimeController(_:)), for: .valueChanged)
         
         return headerView
     }

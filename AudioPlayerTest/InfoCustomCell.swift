@@ -41,7 +41,11 @@ class InfoCustomCell: UITableViewCell {
     
     @IBAction func downloadButtonTapped(_ sender: UIButton) {
         print("DOWNLOAD")
-        if let task = song?.downloadTask {
+        
+        if ((song?.isDownloading) != nil){
+            guard let task = song?.downloadTask else {
+                return
+            }
             task.cancel()
             self.downloadButton.setImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
         } else {

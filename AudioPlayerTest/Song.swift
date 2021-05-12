@@ -61,7 +61,7 @@ class Song: NSObject, URLSessionDownloadDelegate {
     
     
     func download() {
-        
+        print("start downloading")
         guard let localURLU = localURL, let trackURLU = URL(string: trackURL) else { return }
         
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async(execute: {
