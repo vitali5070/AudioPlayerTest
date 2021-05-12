@@ -30,6 +30,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         addSongList()
         
+        
     }
     
     // MARK: Functions
@@ -144,10 +145,17 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         return 50
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // переход на второй вид и передача мета данных в него
-        
-        
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "detailVC"{
+            guard let indexPath = tableView.indexPathForSelectedRow else { return }
+            let song = songs[indexPath.row]
+            if song.isDownloaded{
+            let detailVC = segue.destination as! DetailViewController
+            if let localURLU = song.localURL{
+                detailVC.localURL = localURLU
+            }
+            }
+        }
     }
     
     // MARK: Player functions

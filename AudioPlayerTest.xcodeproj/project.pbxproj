@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E3151CE264BF4E20004A052 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3151CD264BF4E20004A052 /* DetailViewController.swift */; };
 		7E3782F7263774FD005DABAE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3782F6263774FD005DABAE /* AppDelegate.swift */; };
 		7E3782F9263774FD005DABAE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3782F8263774FD005DABAE /* SceneDelegate.swift */; };
 		7E3782FE263774FD005DABAE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E3782FC263774FD005DABAE /* Main.storyboard */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7E3151CD264BF4E20004A052 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		7E3782F3263774FD005DABAE /* AudioPlayerTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioPlayerTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E3782F6263774FD005DABAE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7E3782F8263774FD005DABAE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				7E3782F6263774FD005DABAE /* AppDelegate.swift */,
 				7E3782F8263774FD005DABAE /* SceneDelegate.swift */,
 				7E3782FC263774FD005DABAE /* Main.storyboard */,
+				7E3151CD264BF4E20004A052 /* DetailViewController.swift */,
 				7E37830E26377542005DABAE /* MainViewController.swift */,
 				7E37831E26397061005DABAE /* Song.swift */,
 				7E378312263775AA005DABAE /* InfoCustomCell.swift */,
@@ -156,6 +159,7 @@
 				7E3782F9263774FD005DABAE /* SceneDelegate.swift in Sources */,
 				7E378301263774FD005DABAE /* AudioPlayerTest.xcdatamodeld in Sources */,
 				7E37830F26377542005DABAE /* MainViewController.swift in Sources */,
+				7E3151CE264BF4E20004A052 /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

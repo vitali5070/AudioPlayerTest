@@ -8,7 +8,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Main View Controller-->
+        <!--Audio Player-->
         <scene sceneID="cjs-tP-quK">
             <objects>
                 <viewController id="SA7-74-eF7" customClass="MainViewController" customModule="AudioPlayerTest" customModuleProvider="target" sceneMemberID="viewController">
@@ -105,6 +105,7 @@
                                             <outlet property="pauseResumeDownloadButton" destination="1wQ-gJ-5kj" id="P49-gS-9DH"/>
                                             <outlet property="songImage" destination="LeO-5Z-Vyq" id="Gha-DY-qHQ"/>
                                             <outlet property="titleLabel" destination="f2s-Lw-MoH" id="JnN-C1-GkA"/>
+                                            <segue destination="baT-zs-U4B" kind="show" identifier="detailVC" id="U8i-l2-FPE"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -123,31 +124,89 @@
                             <constraint firstItem="7cg-Ax-ngb" firstAttribute="bottom" secondItem="SDx-xH-d00" secondAttribute="bottom" id="q1m-Vm-VRD"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="6PX-eR-csJ"/>
+                    <navigationItem key="navigationItem" title="Audio Player" id="6PX-eR-csJ"/>
                     <connections>
                         <outlet property="tableView" destination="SDx-xH-d00" id="3hn-TZ-KDp"/>
-                        <segue destination="baT-zs-U4B" kind="show" id="69f-ab-K6A"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3Dn-VE-OkB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="226.40000000000001" y="-114.69265367316342"/>
         </scene>
-        <!--View Controller-->
+        <!--Detail View Controller-->
         <scene sceneID="jDk-vL-V4a">
             <objects>
-                <viewController id="baT-zs-U4B" sceneMemberID="viewController">
+                <viewController id="baT-zs-U4B" customClass="DetailViewController" customModule="AudioPlayerTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="XFp-h9-lvt">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="BYF-30-YZ4">
+                                <rect key="frame" x="67.5" y="104" width="240" height="240"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="EXL-wi-0zd"/>
+                                    <constraint firstAttribute="height" constant="240" id="KB1-DP-PJ1"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Artist" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LZC-gB-icr">
+                                <rect key="frame" x="67.5" y="369" width="240" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="30" id="uee-Dn-fUf"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AlbumName" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tMA-BL-N2L">
+                                <rect key="frame" x="67.5" y="444.5" width="240" height="19.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="light" pointSize="16"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Genre" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5XY-SO-dKP">
+                                <rect key="frame" x="67.5" y="474" width="240" height="17"/>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="14"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SongTitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="U7d-ga-rTc">
+                                <rect key="frame" x="67.5" y="409" width="240" height="25.5"/>
+                                <fontDescription key="fontDescription" type="system" weight="medium" pointSize="21"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="zuo-hu-gvz"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="LZC-gB-icr" firstAttribute="trailing" secondItem="BYF-30-YZ4" secondAttribute="trailing" id="0X8-IZ-6uK"/>
+                            <constraint firstItem="BYF-30-YZ4" firstAttribute="centerX" secondItem="XFp-h9-lvt" secondAttribute="centerX" id="1cg-30-7Y1"/>
+                            <constraint firstItem="tMA-BL-N2L" firstAttribute="leading" secondItem="U7d-ga-rTc" secondAttribute="leading" id="6eh-u3-nux"/>
+                            <constraint firstItem="U7d-ga-rTc" firstAttribute="top" secondItem="LZC-gB-icr" secondAttribute="bottom" constant="10" id="7dx-WG-wWy"/>
+                            <constraint firstItem="5XY-SO-dKP" firstAttribute="trailing" secondItem="tMA-BL-N2L" secondAttribute="trailing" id="EpQ-kb-uP4"/>
+                            <constraint firstItem="5XY-SO-dKP" firstAttribute="top" secondItem="tMA-BL-N2L" secondAttribute="bottom" constant="10" id="KKl-MT-fop"/>
+                            <constraint firstItem="LZC-gB-icr" firstAttribute="leading" secondItem="BYF-30-YZ4" secondAttribute="leading" id="RFJ-YP-iSM"/>
+                            <constraint firstItem="BYF-30-YZ4" firstAttribute="top" secondItem="zuo-hu-gvz" secondAttribute="top" constant="60" id="cht-ir-iP9"/>
+                            <constraint firstItem="5XY-SO-dKP" firstAttribute="leading" secondItem="tMA-BL-N2L" secondAttribute="leading" id="dT3-et-QCf"/>
+                            <constraint firstItem="U7d-ga-rTc" firstAttribute="leading" secondItem="LZC-gB-icr" secondAttribute="leading" id="iLW-dm-a8t"/>
+                            <constraint firstItem="tMA-BL-N2L" firstAttribute="trailing" secondItem="U7d-ga-rTc" secondAttribute="trailing" id="lRY-qK-9xC"/>
+                            <constraint firstItem="U7d-ga-rTc" firstAttribute="trailing" secondItem="LZC-gB-icr" secondAttribute="trailing" id="tOb-h5-xa5"/>
+                            <constraint firstItem="LZC-gB-icr" firstAttribute="top" secondItem="BYF-30-YZ4" secondAttribute="bottom" constant="25" id="uk9-PQ-1SR"/>
+                            <constraint firstItem="tMA-BL-N2L" firstAttribute="top" secondItem="U7d-ga-rTc" secondAttribute="bottom" constant="10" id="zBp-qk-ksq"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="PxM-Lr-QGr"/>
+                    <connections>
+                        <outlet property="albumName" destination="tMA-BL-N2L" id="4nu-Wi-FlJ"/>
+                        <outlet property="artWork" destination="BYF-30-YZ4" id="p0G-3D-9mS"/>
+                        <outlet property="artist" destination="LZC-gB-icr" id="Hc3-zi-6rR"/>
+                        <outlet property="genre" destination="5XY-SO-dKP" id="Hsj-xE-nXJ"/>
+                        <outlet property="songTitle" destination="U7d-ga-rTc" id="RmL-Oa-o5Y"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vzF-GF-W7b" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1024" y="-106"/>
+            <point key="canvasLocation" x="1023.2" y="-106.59670164917542"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Zab-vh-SLf">
