@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import AVFoundation
 
 class Song: NSObject, URLSessionDownloadDelegate {
     
@@ -32,34 +31,27 @@ class Song: NSObject, URLSessionDownloadDelegate {
     let artistName: String
     let imageName: String
     let trackURL: String
-    var isDownloading: Bool = false
-    var isDownloadInProgress:Bool {
-            downloadTask != nil
-        }
     var resumeData: Data?
     
     var progressCallBack:((_ :Float) -> Void)?
     var downloadCallBack:((_ :Bool) -> Void)?
-    var stopDownloadCallBack:((_ :Bool) -> Void)?
-
+    var isDownloading: Bool = false
     
     var localURL: URL? {
         guard let trackURLU = URL(string: trackURL) else { return nil }
-        
         let docsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         let destinationPath = docsPath.appendingPathComponent(trackURLU.lastPathComponent)
         print(destinationPath)
         return destinationPath
     }
+    
     var isDownloaded: Bool {
         guard let localURLU = localURL else { return false }
         let fileExist = FileManager.default.fileExists(atPath: localURLU.path)
         print(fileExist)
         return fileExist ? true : false
     }
-    
-    
-    
+ 
     func download() {
         print("start downloading")
         guard let localURLU = localURL, let trackURLU = URL(string: trackURL) else { return }
@@ -68,7 +60,7 @@ class Song: NSObject, URLSessionDownloadDelegate {
             if FileManager.default.fileExists(atPath: localURLU.path) {
                 print("The file already exists at path")
             } else {
-                self.session = URLSession.init(configuration: .default, delegate: self, delegateQueue: .main)
+                self.session = URLSession.init(configuration: .default, delegate: self, delegateQueue: .current)
                 self.downloadTask = self.session?.downloadTask(with: trackURLU)
                 self.downloadTask?.resume()
             }
@@ -77,46 +69,41 @@ class Song: NSObject, URLSessionDownloadDelegate {
     }
     
     func pauseDownload() {
-        if downloadTask != nil && isDownloading{
-        print("PAUSE")
-        self.downloadTask?.cancel(byProducingResumeData: { (data) in
-            guard let resumeData = data else { return }
-            self.resumeData = resumeData
-        })
-        self.isDownloading = false
-    }
+        if downloadTask != nil {
+            self.downloadTask?.suspend()
+            self.isDownloading = false
+        }
     }
     func resumeDownload() {
-        if !isDownloading && resumeData != nil{
-        print("RESUME")
-        print("Resume data = \(String(describing: resumeData))")
-        if let data = self.resumeData{
-            print("Data = \(data)")
-            self.downloadTask = self.session?.downloadTask(withResumeData: data)
+        if downloadTask != nil {
+        self.downloadTask?.resume()
             self.isDownloading = true
-        } else {
-            self.download()
         }
-            downloadTask?.resume()
     }
+    
+    func cancelDownload() {
+        self.downloadTask?.cancel()
+        self.downloadTask = nil
     }
+    
     // MARK: URLSessionDownloadDelegate
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-            guard let localURLU = self.localURL, downloadTask.error == nil else { return }
-            
-            do {
-                try FileManager.default.copyItem(atPath: location.path, toPath: localURLU.path)
-                DispatchQueue.main.async { [unowned self] in
+        guard let localURLU = self.localURL, downloadTask.error == nil else { return }
+        
+        do {
+            try FileManager.default.copyItem(atPath: location.path, toPath: localURLU.path)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {return}
                 self.downloadCallBack?(true)
-                }
-            } catch  {
-                print(error.localizedDescription)
-                DispatchQueue.main.async { [unowned self] in
-                self.downloadCallBack?(false)
-                }
-                
             }
+        } catch  {
+            print(error.localizedDescription)
+            DispatchQueue.main.async { [unowned self] in
+                self.downloadCallBack?(false)
+            }
+            
+        }
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64){
@@ -128,12 +115,12 @@ class Song: NSObject, URLSessionDownloadDelegate {
         }
     }
     
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard let error = error else { return }
-        let userInfo = (error as NSError).userInfo
-        if let resumeData = userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-            self.resumeData = resumeData
+        func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+            guard let error = error else { return }
+            let userInfo = (error as NSError).userInfo
+            if let resumeData = userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+                self.resumeData = resumeData
+            }
         }
-    }
     
 }

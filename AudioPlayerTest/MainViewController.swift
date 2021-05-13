@@ -8,11 +8,12 @@
 import UIKit
 import AVFoundation
 
-class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate, AVAudioPlayerDelegate{
+class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AVAudioPlayerDelegate{
     
     
     @IBOutlet weak var tableView: UITableView!
     
+    var songs = [Song]()
     var headerHeight: CGFloat = 50
     var audioPlayer: AVAudioPlayer?
     
@@ -20,17 +21,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     var timeSlider = UISlider()
     let timeLabel = UILabel()
     
-    
-    
-    var songs = [Song]()
-    //    let position: Int = 0
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         addSongList()
-        
-        
     }
     
     // MARK: Functions
@@ -68,13 +61,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let seconds = Int(time) % 60
         return String(format:"%02i:%02i", minutes, seconds)
     }
-    
-    func downloadButtonPressed(_ tag: Int) {
-        
-    }
-    
-    
-    
+ 
     // MARK: - Table view data source
     
     
@@ -85,64 +72,35 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! InfoCustomCell
-        
         let song = songs[indexPath.row]
         
-        cell.titleLabel.text = song.name
-        cell.songImage.image = UIImage.init(named: song.imageName)
+        cell.setup(with: song)
+        guard let localURLU = song.localURL else {return UITableViewCell()}
         
-        cell.cellDelegate = self
-        cell.downloadButton.tag = indexPath.row
-        
-        let title = song.isDownloaded ? "play.fill" : "icloud.and.arrow.down.fill"
-        cell.downloadButton.setImage(UIImage(systemName: title), for: .normal)
-        
-        cell.downloadButtonCallBack = { [unowned self] in
-            guard let localURLU = song.localURL else {return}
-            song.downloadTask?.cancel()
-            if song.isDownloaded{
-                play(url: localURLU)
+        song.downloadCallBack = { [unowned self] downloaded in
+            if downloaded {
+                cell.downloaded()
                 self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                cell.pauseResumeDownloadButton.isHidden = true
-            }else{
-                song.download()
-                if cell.downloadProgress.progress < 1 {
-                    cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                    cell.pauseResumeDownloadButton.isHidden = false
-                    cell.pauseResumeDownloadButtonCallBack = {
-                        switch song.isDownloading {
-                        case false:
-                            song.resumeDownload()
-                            cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                        case true:
-                            song.pauseDownload()
-                            cell.pauseResumeDownloadButton.setImage(UIImage(systemName: "icloud.and.arrow.down.fill"), for: .normal)
-                        }
-                        
-                    }
-                }
-                song.downloadCallBack = { [unowned self] downloaded in
-                    if downloaded {
-                        cell.pauseResumeDownloadButton.isHidden = true
-                        cell.downloadButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-                        cell.downloadProgress.progress = 0
-                        self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                        play(url: localURLU)
-                    }
-                }
+                play(url: localURLU)
             }
         }
-        song.progressCallBack = { progress in
-            cell.downloadProgress.setProgress(progress, animated: true)
+        
+        cell.playPauseCallback = { [unowned self] in
+            if self.audioPlayer?.isPlaying == true {
+                self.audioPlayer?.pause()
+                return false
+            } else {
+                self.play(url: localURLU)
+                return true
+            }
         }
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return headerHeight
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -150,11 +108,28 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             guard let indexPath = tableView.indexPathForSelectedRow else { return }
             let song = songs[indexPath.row]
             if song.isDownloaded{
-            let detailVC = segue.destination as! DetailViewController
-            if let localURLU = song.localURL{
-                detailVC.localURL = localURLU
+                let detailVC = segue.destination as! DetailViewController
+                if let localURLU = song.localURL{
+                    detailVC.localURL = localURLU
+                }
             }
-            }
+        }
+    }
+    
+    @IBAction func unwindToMainViewController(segue: UIStoryboardSegue){
+        guard segue.identifier == "unwindToMainVC" else {return}
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0
+        tableView.reloadData()
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let song = songs[indexPath.row]
+
+        if song.isDownloaded{
+            self.performSegue(withIdentifier: "detailVC", sender: self)
+        } else {
+            print("DOWNLOAD MP3 FILE")
         }
     }
     
@@ -167,20 +142,17 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             player.stop()
             playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
         } else {
-            print("PLAY")
             player.play()
             playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
         }
     }
     
     @objc func audioTimeController(_ sender: UISlider){
-        
         audioPlayer?.stop()
         audioPlayer?.currentTime = TimeInterval(timeSlider.value)
         audioPlayer?.prepareToPlay()
         audioPlayer?.play()
         playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-        
     }
     
     @objc func updateTimeValue(){
@@ -189,7 +161,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
             timeLabel.text = timeString(time: currentTime)
         }
     }
-    
     
     func play(url:URL) {
         print("playing \(url)")
@@ -200,6 +171,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                 timeSlider.maximumValue = Float(duration)
             }
             _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateTimeValue), userInfo: nil, repeats: true)
+            audioPlayer?.delegate = self
             audioPlayer?.volume = 1.0
             audioPlayer?.prepareToPlay()
             audioPlayer?.play()
@@ -208,7 +180,6 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         }
         
     }
-    
     
     // MARK: Setup PlayerView at Header
     
@@ -227,9 +198,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         headerView.addSubview(playButton)
         headerView.addSubview(timeLabel)
         headerView.addSubview(timeSlider)
-        
-        
-        
+
         playButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
         playButton.translatesAutoresizingMaskIntoConstraints = false
         playButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
@@ -241,7 +210,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         timeLabel.rightAnchor.constraint(equalTo: headerView.rightAnchor, constant: -10).isActive = true
         timeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 30).isActive = true
         timeLabel.adjustsFontSizeToFitWidth = true
-        timeLabel.text = "01:20"
+        timeLabel.text = "00:00"
         
         timeSlider.translatesAutoresizingMaskIntoConstraints = false
         timeSlider.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
