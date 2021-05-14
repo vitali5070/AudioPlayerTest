@@ -51,9 +51,8 @@ class Song: NSObject, URLSessionDownloadDelegate {
         print(fileExist)
         return fileExist ? true : false
     }
- 
+    
     func download() {
-        print("start downloading")
         guard let localURLU = localURL, let trackURLU = URL(string: trackURL) else { return }
         
         DispatchQueue.global(qos: DispatchQoS.QoSClass.background).async(execute: {
@@ -74,9 +73,10 @@ class Song: NSObject, URLSessionDownloadDelegate {
             self.isDownloading = false
         }
     }
+    
     func resumeDownload() {
         if downloadTask != nil {
-        self.downloadTask?.resume()
+            self.downloadTask?.resume()
             self.isDownloading = true
         }
     }
@@ -115,12 +115,12 @@ class Song: NSObject, URLSessionDownloadDelegate {
         }
     }
     
-        func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-            guard let error = error else { return }
-            let userInfo = (error as NSError).userInfo
-            if let resumeData = userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
-                self.resumeData = resumeData
-            }
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let error = error else { return }
+        let userInfo = (error as NSError).userInfo
+        if let resumeData = userInfo[NSURLSessionDownloadTaskResumeData] as? Data {
+            self.resumeData = resumeData
         }
+    }
     
 }

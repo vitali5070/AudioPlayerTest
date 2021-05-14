@@ -61,7 +61,7 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         let seconds = Int(time) % 60
         return String(format:"%02i:%02i", minutes, seconds)
     }
- 
+    
     // MARK: - Table view data source
     
     
@@ -125,11 +125,9 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let song = songs[indexPath.row]
-
+        
         if song.isDownloaded{
             self.performSegue(withIdentifier: "detailVC", sender: self)
-        } else {
-            print("DOWNLOAD MP3 FILE")
         }
     }
     
@@ -139,10 +137,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         
         guard let player = audioPlayer else {return}
         if player.isPlaying{
-            player.stop()
+            player.pause()
             playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
         } else {
             player.play()
+            
             playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
         }
     }
@@ -198,9 +197,11 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
         headerView.addSubview(playButton)
         headerView.addSubview(timeLabel)
         headerView.addSubview(timeSlider)
-
+        
         playButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
         playButton.translatesAutoresizingMaskIntoConstraints = false
+        playButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        playButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         playButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
         playButton.leftAnchor.constraint(equalTo: headerView.leftAnchor, constant: 15).isActive = true
         playButton.addTarget(self, action: #selector(playButtonPressedInHeader(_:)), for: .touchUpInside)

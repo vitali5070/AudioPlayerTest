@@ -76,13 +76,13 @@ class InfoCustomCell: UITableViewCell {
     }
     
     func playPauseSong() {
+        
         guard let isPlaying = self.playPauseCallback?() else { return }
         if isPlaying {
             self.downloadButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
         } else {
             self.downloadButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
         }
-        
     }
     
     @IBAction func downloadButtonTapped(_ sender: UIButton) {
