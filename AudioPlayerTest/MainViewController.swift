@@ -8,29 +8,22 @@
 import UIKit
 import AVFoundation
 
-class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate {
-
+class MainViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, AVAudioPlayerDelegate{
+    
+    
     @IBOutlet weak var tableView: UITableView!
     
-    let fileManager = FileManager.default
+    var songs = [Song]()
     var headerHeight: CGFloat = 50
-    var audioPlayer = AVAudioPlayer()
+    var audioPlayer: AVAudioPlayer?
     
     let playButton = UIButton()
-    let forwardButton = UIButton()
-    let backwardButton = UIButton()
+    var timeSlider = UISlider()
+    let timeLabel = UILabel()
     
-
-    
-    var songs = [Song]()
-    let position: Int = 0
-    
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         addSongList()
-
     }
     
     // MARK: Functions
@@ -63,138 +56,170 @@ class MainViewController: UIViewController, UITableViewDelegate, UITableViewData
                           trackURL: "https://www.dropbox.com/s/c6f3crqjipawztw/05.%20Sunday%20Song.mp3?dl=1"))
     }
     
-    func downloadButtonPressed(_ tag: Int) {
-        
-        let song = songs[tag]
-        guard let localURLU = song.localURL else {return}
-        
-        if song.isDownloaded{
-            play(url: localURLU)
-        }else{
-            song.download()
-            song.downloadCallBack = { [unowned self] downloaded in
-                if downloaded{
-                    play(url: localURLU)
-                }
-            }
-        }
+    func timeString(time: TimeInterval) -> String {
+        let minutes = Int(time) / 60 % 60
+        let seconds = Int(time) % 60
+        return String(format:"%02i:%02i", minutes, seconds)
     }
-
+    
     // MARK: - Table view data source
-
-
-     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return songs.count
     }
-
+    
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! InfoCustomCell
         
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! InfoCustomCell
         let song = songs[indexPath.row]
         
-        cell.titleLabel.text = song.name
-        cell.songImage.image = UIImage.init(named: song.imageName)
+        cell.setup(with: song)
+        guard let localURLU = song.localURL else {return UITableViewCell()}
         
-        cell.cellDelegate = self
-        cell.downloadButton.tag = indexPath.row
+        song.downloadCallBack = { [unowned self] downloaded in
+            if downloaded {
+                cell.downloaded()
+                self.playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+                play(url: localURLU)
+            }
+        }
         
-        if song.isDownloaded == true{
-            cell.downloadButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
-        } else {
-            cell.downloadButton.setImage(UIImage.init(systemName: "icloud.and.arrow.down.fill"), for: .normal)
+        cell.playPauseCallback = { [unowned self] in
+            if self.audioPlayer?.isPlaying == true {
+                self.audioPlayer?.pause()
+                return false
+            } else {
+                self.play(url: localURLU)
+                return true
+            }
         }
         
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 50
+        return headerHeight
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "detailVC"{
+            guard let indexPath = tableView.indexPathForSelectedRow else { return }
+            let song = songs[indexPath.row]
+            if song.isDownloaded{
+                let detailVC = segue.destination as! DetailViewController
+                if let localURLU = song.localURL{
+                    detailVC.localURL = localURLU
+                }
+            }
+        }
+    }
+    
+    @IBAction func unwindToMainViewController(segue: UIStoryboardSegue){
+        guard segue.identifier == "unwindToMainVC" else {return}
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = 0
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // переход на второй вид и передача мета данных в него
+        let song = songs[indexPath.row]
         
-    
+        if song.isDownloaded{
+            self.performSegue(withIdentifier: "detailVC", sender: self)
+        }
     }
     
     // MARK: Player functions
     
-    @objc func playButtonPressed(_ sender: UIButton){
+    @objc func playButtonPressedInHeader(_ sender: UIButton){
         
-        
-        let musicPath = Bundle.main.path(forResource: "01. Groundhog Day", ofType: "mp3")
-        do{
-            audioPlayer = try AVAudioPlayer(contentsOf: URL(fileURLWithPath: musicPath!))
-        }
-        catch{
-            print(error)
-        }
-        
-        switch audioPlayer.isPlaying {
-        case true:
+        guard let player = audioPlayer else {return}
+        if player.isPlaying{
+            player.pause()
             playButton.setImage(UIImage(systemName: "play.fill"), for: .normal)
-                        audioPlayer.pause()
-        default:
+        } else {
+            player.play()
+            
             playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
-                audioPlayer.play()
+        }
+    }
+    
+    @objc func audioTimeController(_ sender: UISlider){
+        audioPlayer?.stop()
+        audioPlayer?.currentTime = TimeInterval(timeSlider.value)
+        audioPlayer?.prepareToPlay()
+        audioPlayer?.play()
+        playButton.setImage(UIImage(systemName: "pause.fill"), for: .normal)
+    }
+    
+    @objc func updateTimeValue(){
+        if let currentTime = audioPlayer?.currentTime {
+            timeSlider.value = Float(currentTime)
+            timeLabel.text = timeString(time: currentTime)
         }
     }
     
     func play(url:URL) {
         print("playing \(url)")
-        
         do {
+            try AVAudioSession.sharedInstance().setCategory(.playback)
             audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer.prepareToPlay()
-            audioPlayer.volume = 1.0
-            audioPlayer.play()
-        } catch let error as NSError {
-            print(error.localizedDescription)
+            if let duration = audioPlayer?.duration {
+                timeSlider.maximumValue = Float(duration)
+            }
+            _ = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(updateTimeValue), userInfo: nil, repeats: true)
+            audioPlayer?.delegate = self
+            audioPlayer?.volume = 1.0
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
         } catch {
-            print("player error")
+            print(error.localizedDescription)
         }
         
     }
-    
     
     // MARK: Setup PlayerView at Header
     
-     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         return setUpPlayerView()
     }
     
-     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-            return headerHeight
-        }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return headerHeight
+    }
     
     private func setUpPlayerView() -> UIView?{
         
         let headerView = UIView.init(frame: CGRect.init(x: 0, y: 0, width: self.view.frame.width, height: headerHeight))
         headerView.backgroundColor = .systemBackground
         headerView.addSubview(playButton)
-        headerView.addSubview(forwardButton)
-        headerView.addSubview(backwardButton)
-
+        headerView.addSubview(timeLabel)
+        headerView.addSubview(timeSlider)
         
         playButton.setImage(UIImage.init(systemName: "play.fill"), for: .normal)
-        playButton.imageView?.image?.withTintColor(.gray)
         playButton.translatesAutoresizingMaskIntoConstraints = false
-        playButton.centerXAnchor.constraint(equalTo: headerView.centerXAnchor).isActive = true
+        playButton.heightAnchor.constraint(equalToConstant: 40).isActive = true
+        playButton.widthAnchor.constraint(equalToConstant: 40).isActive = true
         playButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        playButton.addTarget(self, action: #selector(playButtonPressed(_:)), for: .touchUpInside)
+        playButton.leftAnchor.constraint(equalTo: headerView.leftAnchor, constant: 15).isActive = true
+        playButton.addTarget(self, action: #selector(playButtonPressedInHeader(_:)), for: .touchUpInside)
         
-        forwardButton.setImage(UIImage.init(systemName: "forward.fill"), for: .normal)
-        forwardButton.translatesAutoresizingMaskIntoConstraints = false
-        forwardButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        forwardButton.leadingAnchor.constraint(equalTo: playButton.trailingAnchor, constant: 10).isActive = true
+        timeLabel.translatesAutoresizingMaskIntoConstraints = false
+        timeLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
+        timeLabel.rightAnchor.constraint(equalTo: headerView.rightAnchor, constant: -10).isActive = true
+        timeLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 30).isActive = true
+        timeLabel.adjustsFontSizeToFitWidth = true
+        timeLabel.text = "00:00"
         
-        backwardButton.setImage(UIImage.init(systemName: "backward.fill"), for: .normal)
-        backwardButton.translatesAutoresizingMaskIntoConstraints = false
-        backwardButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
-        backwardButton.trailingAnchor.constraint(equalTo: playButton.leadingAnchor, constant: -10).isActive = true
+        timeSlider.translatesAutoresizingMaskIntoConstraints = false
+        timeSlider.centerYAnchor.constraint(equalTo: headerView.centerYAnchor).isActive = true
+        timeSlider.leftAnchor.constraint(equalTo: playButton.rightAnchor, constant: 10).isActive = true
+        timeSlider.rightAnchor.constraint(equalTo: timeLabel.leftAnchor,constant: -10).isActive = true
+        timeSlider.addTarget(self, action: #selector(audioTimeController(_:)), for: .valueChanged)
         
         return headerView
     }
-
+    
 }
